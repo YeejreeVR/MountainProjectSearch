@@ -203,25 +203,41 @@ class Mountain_Project:
 
 pass
 class Mountain_project_finder:
-    def findclimbs(link):
+    def findclimbs(link,fee):
+        global wow
+        if '/area/' in link:
+            lks=Mountain_Project.links(link)
+            for links in lks:
+                threading.Thread(target=lambda: Mountain_project_finder.findclimbs(links,fee)).start()
+            pass
+        elif '/route/' in link:
+            
+            threading.Thread(target=lambda: Mountain_project_finder.routelore(link,fee)).start()
+        pass
+    pass
+    def routelore(link,fin):
+        print(link)
+        wow=Mountain_Project.AllInfo(link)
+        if len(wow.Pictures)>0:
+            pic=wow.Pictures[0]
+        else:
+            pic='None'
+        disk=wow.Description.replace('\n','')
+        file=open(fin,'a+')
+        file.write(f'{wow.Name}///{wow.Grade}///{link}///{wow.Stars}///{pic}///{wow.Type}///{disk}///{wow.FA}///{wow.SharedBy}\n')
+        file.close()
+        threading.Thread(target=Mountain_project_finder.configu).start()
+    def findnewclimbs(link,fee):
         global wow
         if '/area/' in link:
             lks=Mountain_Project.links(link)
             for links in lks:
                 Mountain_project_finder.findclimbs(links)
             pass
-        elif '/route/' in link:
-            wow=Mountain_Project.AllInfo(link)
-            if len(wow.Pictures)>0:
-                pic=wow.Pictures[0]
-            else:
-                pic='None'
-            disk=wow.Description.replace('\n','')
-            file.write(f'{wow.Name}///{wow.Grade}///{link}///{wow.Stars}///{pic}///{wow.Type}///{disk}///{wow.FA}///{wow.SharedBy}\n')
-            threading.Thread(target=Mountain_project_finder.configu).start()
+        elif '/route/' in link and link not in ''.join(file.readlines()):
+            threading.Thread(target=lambda: routelore(link)).start()
         pass
-    pass
-    def startmpf(fn,inp):
+    def startmpf(fn,inp,state):
         global file,config,tota,config2
         config=tk.CTkLabel(window,font=('arial',30),text='')
         config.pack(anchor='center')
@@ -230,12 +246,16 @@ class Mountain_project_finder:
         tota=Mountain_Project.AreaContent(inp).TotalClimbs
         fr.place_forget()
         thing.place_forget()
-        file=open(fn,'w')
-        file.close()
-        file=open(fn,'a')
-        Mountain_project_finder.findclimbs(inp)
+        if state == 0:
+            file=open(fn,'w')
+            file.close()
+        
+        if state == 0:
+            Mountain_project_finder.findclimbs(inp,fn)
+        else:
+            Mountain_project_finder.findnewclimbs(inp)
 
-
+        
         config.configure(text='Done',text_color='light green')
         file.close()
     pass
@@ -251,12 +271,14 @@ class Mountain_project_finder:
         grid=tk.CTkFrame(thing)
         grid.pack_propagate(True)
         grid.columnconfigure(0)
-        Button1=tk.CTkButton(grid,text='Update',command=lambda: threading.Thread(target=partial(Mountain_project_finder.startmpf,filenam,Link)).start())
+        Button1=tk.CTkButton(grid,text='Update',command=lambda: threading.Thread(target=partial(Mountain_project_finder.startmpf,filenam,Link,0)).start())
         Button1.grid(column=0,row=0)
+        Button3 = tk.CTkButton(grid,text='Add New',command=lambda: threading.Thread(target=partial(Mountain_project_finder.startmpf,filenam,Link,1)).start())
+        Button3.grid(column=1, row=0)
         Button2=tk.CTkButton(grid,text='Delete',fg_color='red',command=lambda: Mountain_project_finder.Delete(Link,f'/home/{expanduser()}/.local/share/applications/MPS/Searchpybuttons.txt'))
         Button2.bind('<Enter>',lambda event: Button2.configure(text_color='red',fg_color='white'))
         Button2.bind('<Leave>',lambda event: Button2.configure(text_color='white',fg_color='red'))
-        Button2.grid(column=1,row=0)
+        Button2.grid(column=0,row=1)
         grid.pack(pady=10)
 
     pass
@@ -557,4 +579,3 @@ ShaFilter.place(x=300,y=260)
 res=tk.CTkButton(window,text='reset',command=reset,width=50)
 res.place(x=450,y=470)
 window.mainloop()
-
