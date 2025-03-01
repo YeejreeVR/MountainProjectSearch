@@ -226,7 +226,7 @@ class Mountain_project_finder:
         file=open(fin,'a+')
         file.write(f'{wow.Name}///{wow.Grade}///{link}///{wow.Stars}///{pic}///{wow.Type}///{disk}///{wow.FA}///{wow.SharedBy}\n')
         file.close()
-        threading.Thread(target=Mountain_project_finder.configu).start()
+        Mountain_project_finder.configu()
     def findnewclimbs(link,fee):
         global wow
         if '/area/' in link:
