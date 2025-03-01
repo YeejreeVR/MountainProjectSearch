@@ -256,7 +256,6 @@ class Mountain_project_finder:
             Mountain_project_finder.findnewclimbs(inp)
 
         
-        config.configure(text='Done',text_color='light green')
         file.close()
     pass
     def UIthingy(Name,Link,filenam):
